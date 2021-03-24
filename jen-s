@@ -1,0 +1,15 @@
+node{
+   stage('SCM Checkout'){
+      git credentialsId: 'git-cred', url: 'https://github.com/surya9032/my-app.git'
+    }
+   stage('Build'){
+      sh 'mvn clean package'
+    }
+    stage('upload artifacts to s3'){
+       s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'mybucket1forjenkins', excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: true, selectedRegion: 'ap-south-1', showDirectlyInBrowser: false, sourceFile: '**/*', storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: false]], pluginFailureResultConstraint: 'FAILURE', profileName: 'mybucket1forjenkins', userMetadata: []
+    }
+   stage('tomcat'){
+      deploy adapters: [tomcat8(credentialsId: 'tomcat10', path: '', url: 'http://65.2.31.234:8080')], contextPath: null, onFailure: false, war: '**/*.war*'
+    }
+    
+ } 
